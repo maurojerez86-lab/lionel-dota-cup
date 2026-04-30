@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIONEL DOTA CUP — Edición Menudencias</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#c0392b;--red2:#e74c3c;--dark:#07070e;--dark2:#0f0f1a;--dark3:#15151f;
+  --border:#2a2a3a;--text:#e8e8f0;--muted:#7a7a9a;--gold:#c9aa71;
+}
+body{background:var(--dark);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+
+.bg-heroes{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.bg-hero{position:absolute;bottom:0;opacity:0.07;filter:grayscale(30%) contrast(1.2);background-size:contain;background-repeat:no-repeat;background-position:bottom center}
+.bg-hero-1{left:-60px;width:280px;height:420px;background-image:url('https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/invoker.png')}
+.bg-hero-2{left:18%;width:240px;height:380px;background-image:url('https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/faceless_void.png')}
+.bg-hero-3{right:18%;width:240px;height:380px;background-image:url('https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/juggernaut.png')}
+.bg-hero-4{right:-60px;width:280px;height:420px;background-image:url('https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/queenofpain.png')}
+.bg-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse at center,#c0392b18 0%,transparent 70%)}
+
+.app{max-width:680px;margin:0 auto;padding:20px 16px 40px;position:relative;z-index:1}
+
+.header{text-align:center;padding:32px 0 24px;position:relative}
+.header::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:2px;height:32px;background:linear-gradient(to bottom,transparent,var(--red))}
+.logo{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.title{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--text);line-height:1.1;margin-bottom:3px}
+.title span{color:var(--red)}
+.edition{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:4px}
+.subtitle{font-size:12px;color:var(--muted);letter-spacing:.05em}
+
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{flex:1;padding:11px;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.tab.active{color:var(--red2);border-bottom-color:var(--red2)}
+
+.panel{display:none}.panel.active{display:block}
+
+.form-grid{display:grid;gap:12px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{display:block;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.req{color:var(--red);margin-left:2px}
+.field input,.field select{width:100%;background:var(--dark2);border:1px solid var(--border);color:var(--text);font-family:'Exo 2',sans-serif;font-size:13px;padding:9px 11px;border-radius:3px;outline:none;transition:border .2s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus{border-color:var(--red)}
+.field input::placeholder{color:var(--muted)}
+.field select option{background:var(--dark2)}
+
+.mmr-wrap{position:relative}
+.mmr-wrap input{padding-right:70px}
+.mmr-badge{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;letter-spacing:.04em;display:none;transition:all .2s}
+
+.section-divider{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--border);padding-top:10px;margin-top:2px}
+
+.btn{width:100%;margin-top:4px;padding:13px;background:var(--red);border:none;color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:background .2s}
+.btn:hover{background:var(--red2)}
+
+.success{display:none;text-align:center;padding:20px;background:var(--dark2);border:1px solid #1a4a1a;border-radius:4px;margin-top:12px}
+.success.show{display:block}
+.success-icon{font-size:28px;margin-bottom:6px}
+.success-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#4caf50;margin-bottom:3px}
+.success-sub{font-size:12px;color:var(--muted)}
+
+.player-count{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.count-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.count-num{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:var(--gold)}
+
+.player-card{background:var(--dark2);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:4px;padding:12px 14px;margin-bottom:9px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;transition:border .2s}
+.player-card:hover{border-color:var(--red)}
+.player-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--text)}
+.player-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.player-meta{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+.tag{font-size:10px;padding:2px 7px;border-radius:2px;font-weight:500;letter-spacing:.04em}
+.tag-mmr{background:#1a2a3a;color:#7ab3d4}
+.tag-role{background:#1a1a2a;color:#9b89d4}
+.tag-country{background:#1a2a1a;color:#7abf8a}
+.tag-id{background:#2a1a1a;color:#d47a7a}
+.player-medal{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-align:right}
+.delete-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 5px;border-radius:2px;transition:color .2s;display:block;margin-left:auto;margin-top:4px}
+.delete-btn:hover{color:var(--red2)}
+
+.admin-login{background:var(--dark2);border:1px solid var(--border);border-radius:4px;padding:20px;margin-bottom:16px;text-align:center}
+.admin-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.admin-row{display:flex;gap:8px}
+.admin-row input{flex:1;background:var(--dark);border:1px solid var(--border);color:var(--text);font-family:'Exo 2',sans-serif;font-size:13px;padding:8px 11px;border-radius:3px;outline:none}
+.admin-row input:focus{border-color:var(--red)}
+.admin-btn{padding:8px 16px;background:var(--red);border:none;color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:3px}
+
+.empty{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty-icon{font-size:32px;margin-bottom:10px;opacity:.4}
+.empty-text{font-family:'Rajdhani',sans-serif;font-size:14px;letter-spacing:.05em}
+
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{width:100%;background:var(--dark2);border:1px solid var(--border);color:var(--text);font-family:'Exo 2',sans-serif;font-size:13px;padding:9px 11px 9px 34px;border-radius:3px;outline:none}
+.search-wrap input:focus{border-color:var(--red)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px}
+
+.export-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:3px;cursor:pointer;transition:all .2s}
+.export-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+.locked-msg{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+
+/* Steam verification */
+.steam-verify{margin-top:6px;padding:8px 10px;border-radius:3px;font-size:11px;display:none;align-items:center;gap:8px}
+.steam-verify.loading{display:flex;background:#1a1a2a;border:1px solid var(--border);color:var(--muted)}
+.steam-verify.ok{display:flex;background:#0d2a0d;border:1px solid #2a5a2a;color:#6abf6a}
+.steam-verify.err{display:flex;background:#2a0d0d;border:1px solid #5a2a2a;color:#bf6a6a}
+.steam-verify-avatar{width:24px;height:24px;border-radius:2px;object-fit:cover}
+.steam-spin{width:12px;height:12px;border:2px solid var(--muted);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Field validation states */
+.field input.valid,.field select.valid{border-color:#2a5a2a}
+.field input.invalid,.field select.invalid{border-color:#5a2a2a}
+.field-hint{font-size:10px;margin-top:3px;display:none}
+.field-hint.show{display:block}
+.field-hint.ok{color:#6abf6a}
+.field-hint.err{color:#bf6a6a}
+</style>
+</head>
+<body>
+
+<div class="bg-heroes">
+  <div class="bg-glow"></div>
+  <div class="bg-hero bg-hero-1"></div>
+  <div class="bg-hero bg-hero-2"></div>
+  <div class="bg-hero bg-hero-3"></div>
+  <div class="bg-hero bg-hero-4"></div>
+</div>
+
+<div class="app">
+  <div class="header">
+    <div class="logo">Lionel_Dota presenta</div>
+    <div class="title">LIONEL DOTA <span>CUP</span></div>
+    <div class="edition">— Edición Menudencias —</div>
+    <div class="subtitle">Sistema de inscripción oficial</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('form')">Inscribirse</button>
+    <button class="tab" onclick="switchTab('list')" id="tab-list-btn">Inscriptos (0)</button>
+  </div>
+
+  <!-- FORMULARIO -->
+  <div class="panel active" id="panel-form">
+    <div class="form-grid">
+      <div class="section-divider">Datos de Dota 2</div>
+      <div class="form-row">
+        <div class="field">
+          <label>Nick en Dota 2 <span class="req">*</span></label>
+          <input type="text" id="steam" placeholder="Tu nombre en el juego">
+        </div>
+        <div class="field">
+          <label>ID de Dota 2 <span class="req">*</span></label>
+          <input type="text" id="dotaid" placeholder="ej: 123456789" oninput="onDotaIdInput()">
+          <div class="steam-verify" id="steam-status"></div>
+          <div class="field-hint" id="dotaid-hint"></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>MMR actual <span class="req">*</span></label>
+          <div class="mmr-wrap">
+            <input type="number" id="mmr" placeholder="ej: 4500" min="0" max="15000" oninput="updateMmrBadge()">
+            <span class="mmr-badge" id="mmr-badge"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label>País <span class="req">*</span></label>
+          <select id="country">
+            <option value="">Seleccioná...</option>
+            <option>🇦🇷 Argentina</option>
+            <option>🇧🇷 Brasil</option>
+            <option>🇨🇱 Chile</option>
+            <option>🇺🇾 Uruguay</option>
+            <option>🇵🇾 Paraguay</option>
+            <option>🇧🇴 Bolivia</option>
+            <option>🇵🇪 Perú</option>
+            <option>🇨🇴 Colombia</option>
+            <option>🇻🇪 Venezuela</option>
+            <option>🇲🇽 México</option>
+            <option>Otro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Medalla actual <span class="req">*</span></label>
+          <select id="medal">
+            <option value="">Seleccioná...</option>
+            <option value="Herald">🩶 Herald</option>
+            <option value="Guardian">🟢 Guardian</option>
+            <option value="Crusader">🟡 Crusader</option>
+            <option value="Archon">🔵 Archon</option>
+            <option value="Legend">🟣 Legend</option>
+            <option value="Ancient">🔷 Ancient</option>
+            <option value="Divine">✨ Divine</option>
+            <option value="Immortal">🔴 Immortal</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>ID de Discord <span class="req">*</span></label>
+          <input type="text" id="discord" placeholder="ej: usuario#1234">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Mail <span class="req">*</span></label>
+          <input type="email" id="mail" placeholder="tu@email.com" oninput="validateEmail()">
+          <div class="field-hint" id="mail-hint"></div>
+        </div>
+        <div class="field">
+          <label>Canal donde stremea <span class="req">*</span></label>
+          <input type="text" id="stream" placeholder="ej: twitch.tv/usuario (o N/A)">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Rol principal <span class="req">*</span></label>
+          <select id="role1">
+            <option value="">Seleccioná...</option>
+            <option>🗡️ Carry (Pos 1)</option>
+            <option>🧙 Mid (Pos 2)</option>
+            <option>🛡️ Offlane (Pos 3)</option>
+            <option>💫 Support (Pos 4)</option>
+            <option>🌿 Hard Support (Pos 5)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Rol secundario</label>
+
+          <select id="role2">
+            <option value="">Seleccioná...</option>
+            <option>🗡️ Carry (Pos 1)</option>
+            <option>🧙 Mid (Pos 2)</option>
+            <option>🛡️ Offlane (Pos 3)</option>
+            <option>💫 Support (Pos 4)</option>
+            <option>🌿 Hard Support (Pos 5)</option>
+            <option>Flexible</option>
+          </select>
+        </div>
+      </div>
+      <div class="section-divider">Contacto</div>
+      <div class="field">
+        <label>Número de teléfono <span class="req">*</span></label>
+        <input type="tel" id="phone" placeholder="ej: +54 9 11 1234-5678" oninput="validatePhone()">
+        <div class="field-hint" id="phone-hint"></div>
+      </div>
+      <button class="btn" onclick="inscribir()">INSCRIBIRME AL TORNEO</button>
+      <div class="success" id="success">
+        <div class="success-icon">⚔️</div>
+        <div class="success-title">¡Inscripción confirmada!</div>
+        <div class="success-sub">Ya estás en la lista. Lionel_Dota te va a contactar para asignarte equipo.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTA (protegida con contraseña) -->
+  <div class="panel" id="panel-list">
+    <div id="admin-gate">
+      <div class="admin-login">
+        <div class="admin-title">Acceso administrador</div>
+        <div class="admin-row">
+          <input type="password" id="admin-pass" placeholder="Contraseña" onkeydown="if(event.key==='Enter')checkPass()">
+          <button class="admin-btn" onclick="checkPass()">Entrar</button>
+        </div>
+        <div id="pass-error" style="color:#e74c3c;font-size:11px;margin-top:8px;display:none">Contraseña incorrecta</div>
+      </div>
+    </div>
+    <div id="admin-content" style="display:none">
+      <div class="player-count">
+        <span class="count-label">Jugadores inscriptos</span>
+        <span class="count-num" id="total-count">0</span>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Buscar por nick, ID o país..." oninput="renderList(this.value)">
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+        <button class="export-btn" onclick="exportCSV()">Exportar CSV</button>
+      </div>
+      <div id="player-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ⚠️ CAMBIA ESTA CONTRASEÑA antes de subir a Netlify
+const ADMIN_PASSWORD = 'lioneldota2024';
+
+// ⚠️ TU API KEY DE STEAM
+const STEAM_API_KEY = 'A9311D85D890496A88E974F7AB97A865';
+
+// --- STEAM VERIFICATION ---
+let steamVerified = false;
+let steamVerifyTimer = null;
+let lastCheckedId = '';
+
+// Convierte ID de Dota2/Steam32 a SteamID64
+function toSteamID64(id) {
+  const base = BigInt('76561197960265728');
+  try {
+    const n = BigInt(id.trim());
+    if (n > BigInt('76561197960265728')) return id.trim(); // ya es 64-bit
+    return String(base + n);
+  } catch { return null; }
+}
+
+function onDotaIdInput() {
+  steamVerified = false;
+  clearTimeout(steamVerifyTimer);
+  const val = document.getElementById('dotaid').value.trim();
+  const status = document.getElementById('steam-status');
+  const hint = document.getElementById('dotaid-hint');
+  const input = document.getElementById('dotaid');
+
+  if (!val) {
+    status.className = 'steam-verify';
+    status.innerHTML = '';
+    hint.className = 'field-hint';
+    input.className = '';
+    return;
+  }
+
+  if (!/^\d{6,20}$/.test(val)) {
+    status.className = 'steam-verify err';
+    status.innerHTML = '⚠️ La ID solo debe contener números (6-20 dígitos)';
+    input.className = 'invalid';
+    hint.className = 'field-hint';
+    return;
+  }
+
+  if (val === lastCheckedId) return;
+
+  status.className = 'steam-verify loading';
+  status.innerHTML = '<div class="steam-spin"></div> Verificando ID en Steam...';
+  input.className = '';
+  hint.className = 'field-hint';
+
+  steamVerifyTimer = setTimeout(() => verifySteam(val), 800);
+}
+
+async function verifySteam(rawId) {
+  const steamId64 = toSteamID64(rawId);
+  const status = document.getElementById('steam-status');
+  const input = document.getElementById('dotaid');
+
+  if (!steamId64) {
+    status.className = 'steam-verify err';
+    status.innerHTML = '✕ ID inválida';
+    input.className = 'invalid';
+    steamVerified = false;
+    return;
+  }
+
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(
+      `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${STEAM_API_KEY}&steamids=${steamId64}`
+    )}`;
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const parsed = JSON.parse(data.contents);
+    const players = parsed?.response?.players;
+
+    lastCheckedId = rawId;
+
+    if (players && players.length > 0) {
+      const p = players[0];
+      const avatar = p.avatar || '';
+      const name = p.personaname || 'Perfil privado';
+      status.className = 'steam-verify ok';
+      status.innerHTML = `${avatar ? `<img class="steam-verify-avatar" src="${avatar}">` : ''}✔ Perfil encontrado: <strong style="margin-left:3px">${name}</strong>`;
+      input.className = 'valid';
+      steamVerified = true;
+      // Autocompletar nick si está vacío
+      const nickField = document.getElementById('steam');
+      if (!nickField.value.trim()) nickField.value = name;
+    } else {
+      status.className = 'steam-verify err';
+      status.innerHTML = '✕ No se encontró ningún perfil con esa ID. Verificá que sea correcta.';
+      input.className = 'invalid';
+      steamVerified = false;
+    }
+  } catch(e) {
+    status.className = 'steam-verify err';
+    status.innerHTML = '⚠️ No se pudo verificar en este momento. Podés continuar igual.';
+    steamVerified = true; // toleramos fallo de red
+  }
+}
+
+// --- EMAIL VALIDATION ---
+function validateEmail() {
+  const val = document.getElementById('mail').value.trim();
+  const hint = document.getElementById('mail-hint');
+  const input = document.getElementById('mail');
+  if (!val) { hint.className='field-hint'; input.className=''; return; }
+
+  // Formato básico + dominios claramente falsos
+  const reg = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+  const fakeDomains = ['test.com','example.com','asdf.com','asd.asd','mail.com','fake.com','noreply.com'];
+  const domain = val.split('@')[1]?.toLowerCase();
+
+  if (!reg.test(val) || fakeDomains.includes(domain)) {
+    hint.className = 'field-hint err show';
+    hint.textContent = 'Ingresá un mail real y válido.';
+    input.className = 'invalid';
+  } else {
+    hint.className = 'field-hint ok show';
+    hint.textContent = '✔ Formato válido';
+    input.className = 'valid';
+  }
+}
+
+// --- PHONE VALIDATION ---
+function validatePhone() {
+  const val = document.getElementById('phone').value.trim();
+  const hint = document.getElementById('phone-hint');
+  const input = document.getElementById('phone');
+  if (!val) { hint.className='field-hint'; input.className=''; return; }
+
+  // Acepta formatos internacionales: +54 9 11 1234-5678, +598 91 234 567, etc.
+  const digits = val.replace(/[\s\-\(\)]/g,'');
+  const reg = /^\+?[1-9]\d{7,14}$/;
+
+  if (!reg.test(digits)) {
+    hint.className = 'field-hint err show';
+    hint.textContent = 'Formato inválido. Incluí el código de país (ej: +54 9 11 1234-5678).';
+    input.className = 'invalid';
+  } else {
+    hint.className = 'field-hint ok show';
+    hint.textContent = '✔ Número válido';
+    input.className = 'valid';
+  }
+}
+
+function getMedal(mmr){
+  if(mmr<770)return{label:'Herald',color:'#888'};
+  if(mmr<1540)return{label:'Guardian',color:'#7a9a6a'};
+  if(mmr<2310)return{label:'Crusader',color:'#b8860b'};
+  if(mmr<3080)return{label:'Archon',color:'#7ab3d4'};
+  if(mmr<3850)return{label:'Legend',color:'#4a9a4a'};
+  if(mmr<4620)return{label:'Ancient',color:'#4a7abf'};
+  if(mmr<5420)return{label:'Divine',color:'#9b6abf'};
+  return{label:'Immortal',color:'#c0392b'};
+}
+
+function updateMmrBadge(){
+  const v=parseInt(document.getElementById('mmr').value);
+  const b=document.getElementById('mmr-badge');
+  if(!v||v<0){b.style.display='none';return;}
+  const m=getMedal(v);
+  b.style.display='block';
+  b.textContent=m.label;
+  b.style.background=m.color+'33';
+  b.style.color=m.color;
+  b.style.border='1px solid '+m.color+'66';
+}
+
+function loadPlayers(){
+  try{return JSON.parse(localStorage.getItem('lioneldota_players')||'[]');}catch{return[];}
+}
+function savePlayers(p){localStorage.setItem('lioneldota_players',JSON.stringify(p));}
+
+function inscribir(){
+  const steam=document.getElementById('steam').value.trim();
+  const dotaid=document.getElementById('dotaid').value.trim();
+  const mmr=document.getElementById('mmr').value.trim();
+  const country=document.getElementById('country').value;
+  const medal=document.getElementById('medal').value;
+  const discord=document.getElementById('discord').value.trim();
+  const mail=document.getElementById('mail').value.trim();
+  const stream=document.getElementById('stream').value.trim();
+  const role1=document.getElementById('role1').value;
+  const role2=document.getElementById('role2').value;
+  const phone=document.getElementById('phone').value.trim();
+
+  if(!steam||!dotaid||!mmr||!country||!medal||!discord||!mail||!stream||!role1||!phone){
+    alert('Por favor completá todos los campos obligatorios (*).'); return;
+  }
+
+  if(!steamVerified){
+    alert('Esperá a que se verifique tu ID de Steam, o revisá que sea correcta.'); 
+    document.getElementById('dotaid').focus(); return;
+  }
+
+  const emailReg=/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+  if(!emailReg.test(mail)){alert('Ingresá un mail válido.');return;}
+
+  const phoneDigits=phone.replace(/[\s\-\(\)]/g,'');
+  if(!/^\+?[1-9]\d{7,14}$/.test(phoneDigits)){
+    alert('El número de teléfono no parece válido. Incluí el código de país (ej: +54 9 11 ...).'); return;
+  }
+
+  const players=loadPlayers();
+  if(players.find(p=>p.dotaid===dotaid)){
+    alert('Ya hay un jugador inscripto con esa ID de Dota 2.'); return;
+  }
+
+  players.push({steam,dotaid,mmr:parseInt(mmr),country,medal,discord,mail,stream,role1,role2,phone,date:new Date().toLocaleDateString('es-AR')});
+  savePlayers(players);
+
+  ['steam','dotaid','mmr','discord','mail','stream','phone'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.value=''; el.className='';
+  });
+  ['country','medal','role1','role2'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mmr-badge').style.display='none';
+  document.getElementById('steam-status').className='steam-verify';
+  document.getElementById('steam-status').innerHTML='';
+  ['mail-hint','phone-hint','dotaid-hint'].forEach(id=>{document.getElementById(id).className='field-hint';});
+  steamVerified=false; lastCheckedId='';
+  document.getElementById('success').classList.add('show');
+  updateCounts();
+  setTimeout(()=>document.getElementById('success').classList.remove('show'),4000);
+}
+
+function checkPass(){
+  const val=document.getElementById('admin-pass').value;
+  if(val===ADMIN_PASSWORD){
+    document.getElementById('admin-gate').style.display='none';
+    document.getElementById('admin-content').style.display='block';
+    renderList();
+  } else {
+    document.getElementById('pass-error').style.display='block';
+  }
+}
+
+function renderList(filter=''){
+  const players=loadPlayers();
+  const list=document.getElementById('player-list');
+  const f=filter.toLowerCase();
+  const filtered=players.filter(p=>!f||p.steam.toLowerCase().includes(f)||p.dotaid.includes(f)||p.country.toLowerCase().includes(f));
+
+  document.getElementById('total-count').textContent=players.length;
+  document.getElementById('tab-list-btn').textContent='Inscriptos (' + players.length + ')';
+
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">⚔️</div><div class="empty-text">${players.length?'Sin resultados':'Aún no hay inscriptos'}</div></div>`;
+    return;
+  }
+
+  const sorted=[...filtered].sort((a,b)=>b.mmr-a.mmr);
+  list.innerHTML=sorted.map(p=>{
+    const m=getMedal(p.mmr);
+    return`<div class="player-card">
+      <div>
+        <div class="player-name">${p.steam}</div>
+        <div class="player-sub">${p.discord} · ${p.mail} · ${p.date}</div>
+        <div class="player-sub" style="margin-top:2px">${p.phone}${p.stream&&p.stream.toLowerCase()!=='n/a'?` · 🎥 ${p.stream}`:''}</div>
+        <div class="player-meta">
+          <span class="tag tag-id">ID: ${p.dotaid}</span>
+          <span class="tag tag-mmr">${p.mmr} MMR</span>
+          <span class="tag tag-role">${p.role1.replace(/[^\w\s]/g,'').trim()}</span>
+          ${p.role2?`<span class="tag tag-role" style="opacity:.7">${p.role2.replace(/[^\w\s]/g,'').trim()}</span>`:''}
+          <span class="tag tag-country">${p.country}</span>
+        </div>
+      </div>
+      <div>
+        <div class="player-medal" style="color:${m.color}">${p.medal||m.label}</div>
+        <button class="delete-btn" onclick="eliminar('${p.dotaid}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function eliminar(dotaid){
+  if(!confirm('¿Eliminar este jugador de la lista?'))return;
+  let players=loadPlayers().filter(p=>p.dotaid!==dotaid);
+  savePlayers(players);
+  renderList();
+}
+
+function updateCounts(){
+  const players=loadPlayers();
+  document.getElementById('tab-list-btn').textContent='Inscriptos (' + players.length + ')';
+}
+
+function exportCSV(){
+  const players=loadPlayers();
+  if(!players.length){alert('No hay jugadores inscriptos.');return;}
+  const header='Nick,ID Dota 2,MMR,Medalla,País,Discord,Mail,Stream,Teléfono,Rol Principal,Rol Secundario,Fecha';
+  const rows=players.map(p=>`${p.steam},${p.dotaid},${p.mmr},${p.medal||getMedal(p.mmr).label},${p.country},${p.discord||''},${p.mail||''},${p.stream||''},${p.phone},"${p.role1}","${p.role2||''}",${p.date}`);
+  const csv=[header,...rows].join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='lionel_dota_cup_inscriptos.csv';
+  a.click();
+}
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',['form','list'][i]===t));
+  document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',['panel-form','panel-list'][i]==='panel-'+t));
+}
+
+updateCounts();
+</script>
+</body>
+</html>
