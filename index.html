@@ -459,14 +459,14 @@ function updateMmrBadge(){
 // --- API FUNCTIONS (Netlify Blobs) ---
 async function loadPlayers(){
   try{
-    const res = await fetch('/api/get-players');
+    const res = await fetch('/.netlify/functions/get-players');
     if(!res.ok) return [];
     return await res.json();
   } catch { return []; }
 }
 
 async function savePlayer(player){
-  const res = await fetch('/api/save-player', {
+  const res = await fetch('/.netlify/functions/save-player', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ player })
@@ -475,7 +475,7 @@ async function savePlayer(player){
 }
 
 async function deletePlayer(dotaid){
-  const res = await fetch('/api/delete-player', {
+  const res = await fetch('/.netlify/functions/delete-player', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ dotaid, password: adminPassword })
@@ -539,7 +539,7 @@ async function inscribir(){
 async function checkPass(){
   const val=document.getElementById('admin-pass').value;
   // Verificar contraseña contra el servidor
-  const res = await fetch('/api/check-pass', {
+  const res = await fetch('/.netlify/functions/check-pass', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({ password: val })
