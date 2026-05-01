@@ -1,19 +1,20 @@
-import { getStore } from '@netlify/blobs';
+const { getStore } = require('@netlify/blobs');
 
-export default async (req, context) => {
-  const store = getStore('players');
-  const { blobs } = await store.list();
-
-  const players = await Promise.all(
-    blobs.map(async ({ key }) => {
-      const data = await store.get(key, { type: 'json' });
-      return data;
-    })
-  );
-
-  return new Response(JSON.stringify(players.filter(Boolean)), {
-    headers: { 'Content-Type': 'application/json' }
-  });
+exports.handler = async (event, context) => {
+  try {
+    const store = getStore('players');
+    const { blobs } = await store.list();
+    const players = await Promise.all(
+      blobs.map(async ({ key }) => {
+        try { return await store.get(key, { type: 'json' }); } catch(e) { return null; }
+      })
+    );
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(players.filter(Boolean))
+    };
+  } catch(e) {
+    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
+  }
 };
-
-export const config = { path: '/api/get-players' };
