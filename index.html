@@ -538,7 +538,13 @@ async function inscribir(){
 
 async function checkPass(){
   const val=document.getElementById('admin-pass').value;
-  if(val===ADMIN_PASSWORD){
+  // Verificar contraseña contra el servidor
+  const res = await fetch('/api/check-pass', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ password: val })
+  });
+  if(res.ok){
     adminPassword=val;
     document.getElementById('admin-gate').style.display='none';
     document.getElementById('admin-content').style.display='block';
