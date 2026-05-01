@@ -289,7 +289,7 @@ body{background:var(--dark);color:var(--text);font-family:'Exo 2',sans-serif;min
 const ADMIN_PASSWORD = 'lioneldota2024';
 
 // ⚠️ TU API KEY DE STEAM
-const STEAM_API_KEY = 'A9311D85D890496A88E974F7AB97A865';
+const STEAM_API_KEY = '7466FF403175294DAC5D236B130332FF';
 
 // --- STEAM VERIFICATION ---
 let steamVerified = false;
@@ -456,12 +456,36 @@ function updateMmrBadge(){
   b.style.border='1px solid '+m.color+'66';
 }
 
-function loadPlayers(){
-  try{return JSON.parse(localStorage.getItem('lioneldota_players')||'[]');}catch{return[];}
+// --- API FUNCTIONS (Netlify Blobs) ---
+async function loadPlayers(){
+  try{
+    const res = await fetch('/api/get-players');
+    if(!res.ok) return [];
+    return await res.json();
+  } catch { return []; }
 }
-function savePlayers(p){localStorage.setItem('lioneldota_players',JSON.stringify(p));}
 
-function inscribir(){
+async function savePlayer(player){
+  const res = await fetch('/api/save-player', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ player })
+  });
+  return res;
+}
+
+async function deletePlayer(dotaid){
+  const res = await fetch('/api/delete-player', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ dotaid, password: adminPassword })
+  });
+  return res.ok;
+}
+
+let adminPassword = '';
+
+async function inscribir(){
   const steam=document.getElementById('steam').value.trim();
   const dotaid=document.getElementById('dotaid').value.trim();
   const mmr=document.getElementById('mmr').value.trim();
@@ -477,31 +501,29 @@ function inscribir(){
   if(!steam||!dotaid||!mmr||!country||!medal||!discord||!mail||!stream||!role1||!phone){
     alert('Por favor completá todos los campos obligatorios (*).'); return;
   }
-
   if(!steamVerified){
-    alert('Esperá a que se verifique tu ID de Steam, o revisá que sea correcta.'); 
+    alert('Esperá a que se verifique tu ID de Steam, o revisá que sea correcta.');
     document.getElementById('dotaid').focus(); return;
   }
-
   const emailReg=/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
   if(!emailReg.test(mail)){alert('Ingresá un mail válido.');return;}
-
   const phoneDigits=phone.replace(/[\s\-\(\)]/g,'');
   if(!/^\+?[1-9]\d{7,14}$/.test(phoneDigits)){
     alert('El número de teléfono no parece válido. Incluí el código de país (ej: +54 9 11 ...).'); return;
   }
 
-  const players=loadPlayers();
-  if(players.find(p=>p.dotaid===dotaid)){
-    alert('Ya hay un jugador inscripto con esa ID de Dota 2.'); return;
-  }
+  const btn=document.querySelector('.btn');
+  btn.textContent='Guardando...'; btn.disabled=true;
 
-  players.push({steam,dotaid,mmr:parseInt(mmr),country,medal,discord,mail,stream,role1,role2,phone,date:new Date().toLocaleDateString('es-AR')});
-  savePlayers(players);
+  const player={steam,dotaid,mmr:parseInt(mmr),country,medal,discord,mail,stream,role1,role2,phone,date:new Date().toLocaleDateString('es-AR')};
+  const res=await savePlayer(player);
+  btn.textContent='INSCRIBIRME AL TORNEO'; btn.disabled=false;
+
+  if(res.status===409){alert('Ya hay un jugador inscripto con esa ID de Dota 2.');return;}
+  if(!res.ok){alert('Hubo un error al guardar. Intentá de nuevo.');return;}
 
   ['steam','dotaid','mmr','discord','mail','stream','phone'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.value=''; el.className='';
+    const el=document.getElementById(id); el.value=''; el.className='';
   });
   ['country','medal','role1','role2'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('mmr-badge').style.display='none';
@@ -510,29 +532,31 @@ function inscribir(){
   ['mail-hint','phone-hint','dotaid-hint'].forEach(id=>{document.getElementById(id).className='field-hint';});
   steamVerified=false; lastCheckedId='';
   document.getElementById('success').classList.add('show');
-  updateCounts();
+  await updateCounts();
   setTimeout(()=>document.getElementById('success').classList.remove('show'),4000);
 }
 
-function checkPass(){
+async function checkPass(){
   const val=document.getElementById('admin-pass').value;
   if(val===ADMIN_PASSWORD){
+    adminPassword=val;
     document.getElementById('admin-gate').style.display='none';
     document.getElementById('admin-content').style.display='block';
-    renderList();
+    await renderList();
   } else {
     document.getElementById('pass-error').style.display='block';
   }
 }
 
-function renderList(filter=''){
-  const players=loadPlayers();
+async function renderList(filter=''){
   const list=document.getElementById('player-list');
+  list.innerHTML='<div class="empty"><div class="empty-icon">⏳</div><div class="empty-text">Cargando...</div></div>';
+  const players=await loadPlayers();
   const f=filter.toLowerCase();
   const filtered=players.filter(p=>!f||p.steam.toLowerCase().includes(f)||p.dotaid.includes(f)||p.country.toLowerCase().includes(f));
 
   document.getElementById('total-count').textContent=players.length;
-  document.getElementById('tab-list-btn').textContent='Inscriptos (' + players.length + ')';
+  document.getElementById('tab-list-btn').textContent='Inscriptos ('+players.length+')';
 
   if(!filtered.length){
     list.innerHTML=`<div class="empty"><div class="empty-icon">⚔️</div><div class="empty-text">${players.length?'Sin resultados':'Aún no hay inscriptos'}</div></div>`;
@@ -563,20 +587,20 @@ function renderList(filter=''){
   }).join('');
 }
 
-function eliminar(dotaid){
+async function eliminar(dotaid){
   if(!confirm('¿Eliminar este jugador de la lista?'))return;
-  let players=loadPlayers().filter(p=>p.dotaid!==dotaid);
-  savePlayers(players);
-  renderList();
+  const ok=await deletePlayer(dotaid);
+  if(ok) await renderList();
+  else alert('Error al eliminar. Verificá la contraseña.');
 }
 
-function updateCounts(){
-  const players=loadPlayers();
-  document.getElementById('tab-list-btn').textContent='Inscriptos (' + players.length + ')';
+async function updateCounts(){
+  const players=await loadPlayers();
+  document.getElementById('tab-list-btn').textContent='Inscriptos ('+players.length+')';
 }
 
-function exportCSV(){
-  const players=loadPlayers();
+async function exportCSV(){
+  const players=await loadPlayers();
   if(!players.length){alert('No hay jugadores inscriptos.');return;}
   const header='Nick,ID Dota 2,MMR,Medalla,País,Discord,Mail,Stream,Teléfono,Rol Principal,Rol Secundario,Fecha';
   const rows=players.map(p=>`${p.steam},${p.dotaid},${p.mmr},${p.medal||getMedal(p.mmr).label},${p.country},${p.discord||''},${p.mail||''},${p.stream||''},${p.phone},"${p.role1}","${p.role2||''}",${p.date}`);
